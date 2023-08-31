@@ -1,0 +1,79 @@
+要将后端用sendFile函数返回的文件在一个新的浏览器页面显示出来，可以按照以下步骤进行操作：
+
+1. 在Vue项目中创建一个新的组件，用于显示文件内容。可以命名为FileViewer.vue。
+
+2. 在FileViewer.vue组件中添加一个iframe元素，用于在新的浏览器页面中显示文件内容。
+
+```html
+<template>
+  <div>
+    <iframe ref="fileViewer" width="100%" height="100%"></iframe>
+  </div>
+</template>
+```
+
+3. 在FileViewer.vue组件中添加一个方法，用于接收文件的URL，并将其赋值给iframe的src属性。
+
+```javascript
+<script>
+export default {
+  mounted() {
+    this.$nextTick(() => {
+      this.loadFile();
+    });
+  },
+  methods: {
+    loadFile() {
+      const fileUrl = 'http://your-backend-server/file.pdf'; // 替换为实际的文件URL
+      this.$refs.fileViewer.src = fileUrl;
+    },
+  },
+};
+</script>
+```
+
+4. 使用Vue Router将FileViewer.vue组件添加到路由中，以便在浏览器中可以通过URL访问到该页面。
+
+```javascript
+import VueRouter from 'vue-router';
+import FileViewer from '@/components/FileViewer';
+
+const routes = [
+  // 其他路由
+  {
+    path: '/view-file',
+    name: 'FileViewer',
+    component: FileViewer,
+  },
+];
+
+const router = new VueRouter({
+  routes,
+});
+
+export default router;
+```
+
+5. 在后端的Node.js代码中，处理客户端请求时，使用sendFile函数发送文件。
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/download-file', (req, res) => {
+  const filePath = __dirname + '/path/to/file.pdf'; // 替换为实际的文件路径
+  res.sendFile(filePath);
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+```
+
+6. 在Vue前端中，通过router-link或编程式导航跳转到FileViewer组件所在的页面。
+
+```html
+<router-link to="/view-file">View File</router-link>
+```
+
+这样，当用户点击"View File"链接时，将会打开一个新的浏览器页面，并在该页面中显示通过sendFile函数返回的文件内容。
